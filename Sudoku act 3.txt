@@ -1,0 +1,80 @@
+package com.mycompany.sudokusolver;
+
+public class SudokuSolver {
+    static int[][] board = {
+        {0,0,0,0,4,0,0,0,8},
+        {4,0,2,0,0,0,0,9,0},
+        {0,1,5,6,0,3,0,0,0},
+        {0,0,0,0,0,0,0,0,5},
+        {0,0,9,0,2,0,3,6,0},
+        {1,0,3,0,5,0,0,0,0},
+        {0,5,7,4,0,0,0,0,0},
+        {3,0,0,0,0,0,4,0,9},
+        {2,0,0,5,0,0,0,3,0}
+    };
+
+    public static void main(String[] args) {
+        System.out.println("Sudoku inicial:");
+        printBoard();
+        boolean solved = solve(0);
+        if (solved) {
+            System.out.println("\nSudoku resuelto:");
+            printBoard();
+        } else {
+            System.out.println("No se encontró solución.");
+        }
+    }
+
+    // Backtracking recursivo: index de 0 a 80 (fila*9 + col)
+    static boolean solve(int index) {
+        if (index == 81) return true; // todas las casillas asignadas
+        int row = index / 9;
+        int col = index % 9;
+
+        if (board[row][col] != 0) {
+            return solve(index + 1);
+        } else {
+            for (int num = 1; num <= 9; num++) {
+                if (isSafe(row, col, num)) {
+                    board[row][col] = num;
+                    if (solve(index + 1)) return true;
+                    board[row][col] = 0; // backtrack
+                }
+            }
+        }
+        return false; // ninguna cifra válida
+    }
+
+    static boolean isSafe(int row, int col, int num) {
+        // comprobar fila
+        for (int c = 0; c < 9; c++) {
+            if (board[row][c] == num) return false;
+        }
+        // comprobar columna
+        for (int r = 0; r < 9; r++) {
+            if (board[r][col] == num) return false;
+        }
+        // comprobar subcuadro 3x3
+        int startRow = (row / 3) * 3;
+        int startCol = (col / 3) * 3;
+        for (int r = startRow; r < startRow + 3; r++) {
+            for (int c = startCol; c < startCol + 3; c++) {
+                if (board[r][c] == num) return false;
+            }
+        }
+        return true;
+    }
+
+    static void printBoard() {
+        for (int r = 0; r < 9; r++) {
+            if (r % 3 == 0) System.out.println("+-------+-------+-------+");
+            for (int c = 0; c < 9; c++) {
+                if (c % 3 == 0) System.out.print("| ");
+                System.out.print(board[r][c] == 0 ? "." : board[r][c]);
+                System.out.print(' ');
+            }
+            System.out.println("|");
+        }
+        System.out.println("+-------+-------+-------+");
+    }
+}
